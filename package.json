@@ -1,0 +1,35 @@
+{
+  "name": "grunt-jpm",
+  "version": "0.1.0",
+  "description": "Grunt Mozilla JPM Plugin",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rpl/grunt-jpm"
+  },
+  "keywords": [
+    "gruntplugin",
+    "grunt",
+    "mozilla",
+    "addon-sdk",
+    "jpm"
+  ],
+  "author": {
+    "name": "Luca Greco",
+    "email": "luca.greco@alcacoop.it",
+    "url": "http://github.com/rpl"
+  },
+  "license": "MPL v2.0",
+  "bugs": {
+    "url": "https://github.com/rpl/grunt-jpm/issues"
+  },
+  "dependencies": {
+    "grunt": "~0.4.0",
+    "jpm": "0.0.16"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.0"
+  }
+}
