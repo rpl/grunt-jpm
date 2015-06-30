@@ -1,4 +1,4 @@
-# grunt-jpm v.0.1.0
+# grunt-jpm v.0.1.1
 
 > Run and build Firefox Addon using JPM from your Gruntfile.js
 
