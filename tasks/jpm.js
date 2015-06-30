@@ -56,7 +56,7 @@ module.exports = function(grunt) {
       debug: grunt.option('firefox-debugger'),
       profile: grunt.option('firefox-profile') || process.env.FIREFOX_PROFILE,
       binary: grunt.option('firefox-bin') || process.env.FIREFOX_BIN
-    }).then(null, function(e) {
+    }).then(done, function(e) {
       grunt.log.error("Error running Firefox:", e);
     });
   });
