@@ -1,9 +1,9 @@
-# grunt-jpm v.0.1.1
+# grunt-jpm v.0.1.2
 
 > Run and build Firefox Addon using JPM from your Gruntfile.js
 
 ## Getting Started
-This plugin requires Grunt `~0.4.0` 
+This plugin requires Grunt `~0.4.0`
 
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
@@ -58,3 +58,9 @@ Optionally you can:
   to specify the absolute path to a Firefox profile
 - use the **--firefox-debugger** command line option to automatically start the Firefox Developer Toolbox connected to the add-on
 - use the **--verbose** and *-d* command line option to run the tasks verbosely
+
+## Release History
+
+- 0.1.2 - update jpm to the latest version (1.0.0)
+- 0.1.1 - relese fix #3 "invoke done for successful jpm runs"
+- 0.1.0 - initial release
