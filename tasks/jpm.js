@@ -20,19 +20,23 @@ module.exports = function(grunt) {
 
     var done = this.async();
 
-    var manifest = jpm_env.manifest;
     var dirs = jpm_env.dirs;
 
-    jpm_xpi(manifest, {
-      verbose: grunt.option('debug'),
-      xpiPath: dirs.xpi
-    }).then(function(res) {
-      grunt.log.ok("Generated XPI: ", res);
-    }, function(e) {
-      grunt.log.error("Error during XPI build:", e);
-    }).then(function () {
-      process.chdir(dirs.old);
-      done();
+    //jpm_env.manifest is a Promise
+    jpm_env.manifest.then(function(result) {
+
+      jpm_xpi(result, {
+        verbose: grunt.option('debug'),
+        xpiPath: dirs.xpi
+      }).then(function(res) {
+        grunt.log.ok("Generated XPI: ", res);
+      }, function(e) {
+        grunt.log.error("Error during XPI build:", e);
+      }).then(function () {
+        process.chdir(dirs.old);
+        done(true);
+      });
+
     });
   });
 
