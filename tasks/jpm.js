@@ -75,10 +75,10 @@ module.exports = function(grunt) {
     grunt.verbose.ok('Moving from directory: ' + process.cwd());
     grunt.verbose.ok('Moving to directory: ' + dirs.src);
 
-    process.chdir(path.join(dirs.old, dirs.src));
+    process.chdir(dirs.src);
     grunt.verbose.ok('New directory: ' + process.cwd());
 
-    var manifest = jpm_utils.getManifest();
+    var manifest = jpm_utils.getManifest({addonDir:dirs.src});
 
     return { manifest: manifest, dirs: dirs };
   }
@@ -89,7 +89,7 @@ function resolveDirsFromConfig(grunt_config, name) {
 
   return {
     old: old_dir,
-    src: grunt_config["src"],
+    src: path.join(old_dir, grunt_config["src"]),
     xpi: path.join(old_dir, grunt_config["xpi"] || XPI_PATH)
   };
 }
