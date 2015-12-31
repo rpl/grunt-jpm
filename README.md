@@ -29,6 +29,7 @@ grunt.initConfig({
       src: "./src/",
       xpi: "./tmp/"
     }
+  }
 });
 ```
 
