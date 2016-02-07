@@ -21,7 +21,7 @@
     "email": "luca.greco@alcacoop.it",
     "url": "http://github.com/rpl"
   },
-  "license": "MPL v2.0",
+  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/rpl/grunt-jpm/issues"
   },
