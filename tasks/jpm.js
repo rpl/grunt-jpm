@@ -1,4 +1,5 @@
 var path = require('path');
+var mkdirp = require('mkdirp');
 var jpm_utils = require("jpm/lib/utils");
 var jpm_xpi = require("jpm/lib/xpi");
 var jpm_run = require("jpm/lib/run");
@@ -24,19 +25,25 @@ module.exports = function(grunt) {
 
     //jpm_env.manifest is a Promise
     jpm_env.manifest.then(function(result) {
+      // Ensure dest xpi dir exists
+      mkdirp(dirs.xpi, function(error) {
+        if (error) {
+          grunt.log.error("Error creating xpi dest dir: " + error);
+          return;
+        }
 
-      jpm_xpi(result, {
-        verbose: grunt.option('debug'),
-        xpiPath: dirs.xpi
-      }).then(function(res) {
-        grunt.log.ok("Generated XPI: ", res);
-      }, function(e) {
-        grunt.log.error("Error during XPI build:", e);
-      }).then(function () {
-        process.chdir(dirs.old);
-        done(true);
+        jpm_xpi(result, {
+          verbose: grunt.option('debug'),
+          addonDir: dirs.src,
+          xpiPath: dirs.xpi
+        }).then(function(res) {
+          grunt.log.ok("Generated XPI: ", res);
+        }, function(e) {
+          grunt.log.error("Error during XPI build:", e);
+        }).then(function () {
+          done(true);
+        });
       });
-
     });
   });
 
@@ -56,6 +63,7 @@ module.exports = function(grunt) {
     var dirs = jpm_env.dirs;
 
     jpm_run(jpm_env.manifest, {
+      addonDir: dirs.src,
       verbose: grunt.option('debug'),
       debug: grunt.option('firefox-debugger'),
       profile: grunt.option('firefox-profile') || process.env.FIREFOX_PROFILE,
@@ -71,13 +79,6 @@ module.exports = function(grunt) {
     grunt.verbose.ok("Loading config", grunt_config);
 
     var dirs = resolveDirsFromConfig(grunt_config);
-
-    grunt.verbose.ok('Moving from directory: ' + process.cwd());
-    grunt.verbose.ok('Moving to directory: ' + dirs.src);
-
-    process.chdir(dirs.src);
-    grunt.verbose.ok('New directory: ' + process.cwd());
-
     var manifest = jpm_utils.getManifest({addonDir:dirs.src});
 
     return { manifest: manifest, dirs: dirs };
@@ -85,11 +86,8 @@ module.exports = function(grunt) {
 };
 
 function resolveDirsFromConfig(grunt_config, name) {
-  var old_dir = process.cwd();
-
   return {
-    old: old_dir,
-    src: path.join(old_dir, grunt_config["src"]),
-    xpi: path.join(old_dir, grunt_config["xpi"] || XPI_PATH)
+    src: path.resolve(grunt_config["src"]),
+    xpi: path.resolve(grunt_config["xpi"] || XPI_PATH)
   };
 }
