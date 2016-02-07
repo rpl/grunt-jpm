@@ -1,4 +1,4 @@
-# grunt-jpm v.0.1.2
+# grunt-jpm v.0.1.3
 
 > Run and build Firefox Addon using JPM from your Gruntfile.js
 
@@ -62,6 +62,7 @@ Optionally you can:
 
 ## Release History
 
+- 0.1.3 - update jpm to 1.0.5, fix error when xpi dest dir does not exist
 - 0.1.2 - update jpm to the latest version (1.0.0)
 - 0.1.1 - relese fix #3 "invoke done for successful jpm runs"
 - 0.1.0 - initial release
