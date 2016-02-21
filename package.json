@@ -31,6 +31,6 @@
     "mkdirp": "^0.5.1"
   },
   "peerDependencies": {
-    "grunt": "~0.4.0"
+    "grunt": ">=0.4.0"
   }
 }
