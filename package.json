@@ -27,7 +27,8 @@
   },
   "dependencies": {
     "grunt": "~0.4.0",
-    "jpm": "~1.0.5",
+    "jetpack-id": "^1.0.0",
+    "jpm": "~1.0.6",
     "mkdirp": "^0.5.1"
   },
   "peerDependencies": {
