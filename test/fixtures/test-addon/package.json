@@ -1,0 +1,6 @@
+{
+  "name": "test-addon",
+  "version": "1.0.0",
+  "id": "test-addon@alcacoop.it",
+  "main": "./lib/main.js"
+}

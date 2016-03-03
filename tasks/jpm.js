@@ -3,91 +3,109 @@ var mkdirp = require('mkdirp');
 var jpm_utils = require("jpm/lib/utils");
 var jpm_xpi = require("jpm/lib/xpi");
 var jpm_run = require("jpm/lib/run");
+var jpm_test = require("jpm/lib/test");
 
-const XPI_PATH = "./tmp/";
+if (!Promise) {
+  var Promise = require("es6-promise").Promise;
+}
+
+var XPI_PATH = "./tmp/";
 
 module.exports = function(grunt) {
   'use strict';
 
   grunt.registerTask('jpm:xpi', "build firefox xpi", function() {
-    var jpm_env = {};
-
-    try {
-      jpm_env = prepareJPMGruntTask();
-    } catch(e) {
-      grunt.log.error("Error preparing JPM Grunt Task: " + e);
-      return;
-    }
-
     var done = this.async();
-
-    var dirs = jpm_env.dirs;
-
-    //jpm_env.manifest is a Promise
-    jpm_env.manifest.then(function(result) {
-      // Ensure dest xpi dir exists
-      mkdirp(dirs.xpi, function(error) {
-        if (error) {
-          grunt.log.error("Error creating xpi dest dir: " + error);
-          return;
-        }
-
-        jpm_xpi(result, {
-          verbose: grunt.option('debug'),
-          addonDir: dirs.src,
-          xpiPath: dirs.xpi
-        }).then(function(res) {
-          grunt.log.ok("Generated XPI: ", res);
-        }, function(e) {
-          grunt.log.error("Error during XPI build:", e);
-        }).then(function () {
-          done(true);
+    prepareJPMGruntTask().then(function (cfg) {
+      return new Promise(function (resolve, reject) {
+        mkdirp(cfg.dirs.xpi, function (error) {
+          if (error) {
+            reject(error);
+          } else {
+            resolve();
+          }
         });
+      }).then(function () {
+        return jpm_xpi(cfg.manifest, cfg.jpmOptions);
       });
+    }).then(function(res) {
+      grunt.log.ok("Generated XPI: ", res);
+      done(true);
+    }).catch(function(e) {
+      grunt.log.error("Error during XPI build:", e);
+      done(false);
     });
   });
 
   grunt.registerTask('jpm:run', "run firefox addon", function() {
+    var done = this.async();
+    prepareJPMGruntTask().then(function (cfg) {
+      return jpm_run(cfg.manifest, cfg.jpmOptions);
+    }).then(function() {
+      done(true);
+    }, function(e) {
+      grunt.log.error("Error running Firefox:", e);
+      done(false);
+    });
+  });
+
+  grunt.registerTask('jpm:test', "test firefox addon", function() {
+    var done = this.async();
+    prepareJPMGruntTask().then(function (cfg) {
+      return jpm_test(cfg.manifest, cfg.jpmOptions);
+    }).then(function (results) {
+      if (results.code !== 0) {
+        done(false);
+      }
+      done(true);
+    }, function(e) {
+      grunt.log.error("Error running Firefox:", e);
+      done(false);
+    });
+  });
+
+  function jpm(jpm_cmd) {
     var jpm_env = {};
 
     try {
       jpm_env = prepareJPMGruntTask();
     } catch(e) {
       grunt.log.error("Error preparing JPM Grunt Task: " + e);
-      return;
+      return Promise.reject(e);
     }
 
-    var done = this.async();
-
-    var manifest = jpm_env.manifest;
     var dirs = jpm_env.dirs;
 
-    jpm_run(jpm_env.manifest, {
-      addonDir: dirs.src,
-      verbose: grunt.option('debug'),
-      debug: grunt.option('firefox-debugger'),
-      profile: grunt.option('firefox-profile') || process.env.FIREFOX_PROFILE,
-      binary: grunt.option('firefox-bin') || process.env.FIREFOX_BIN
-    }).then(done, function(e) {
-      grunt.log.error("Error running Firefox:", e);
+    //jpm_env.manifest is a Promise
+    return jpm_env.manifest.then(function(manifest) {
+      return jpm_task(manifest, {
+        command: jpm_cmd,
+      });
     });
-  });
+  }
 
   function prepareJPMGruntTask() {
     var grunt_config = grunt.config(["jpm", "options"]);
 
     grunt.verbose.ok("Loading config", grunt_config);
 
-    var dirs = resolveDirsFromConfig(grunt_config);
-    var manifest = jpm_utils.getManifest({addonDir:dirs.src});
+    var dirs = {
+      src: path.resolve(grunt_config["src"]),
+      xpi: path.resolve(grunt_config["xpi"] || XPI_PATH)
+    };
+    var manifestPromise = jpm_utils.getManifest({addonDir:dirs.src});
 
-    return { manifest: manifest, dirs: dirs };
+    var jpmOptions = {
+      addonDir: dirs.src,
+      xpiPath: dirs.xpi,
+      verbose: grunt.option('debug'),
+      debug: grunt.option('firefox-debugger'),
+      profile: grunt.option('firefox-profile') || process.env.FIREFOX_PROFILE,
+      binary: grunt.option('firefox-bin') || process.env.FIREFOX_BIN
+    };
+
+    return manifestPromise.then(function (manifest) {
+      return { manifest: manifest, dirs: dirs, jpmOptions: jpmOptions };
+    });
   }
 };
-
-function resolveDirsFromConfig(grunt_config, name) {
-  return {
-    src: path.resolve(grunt_config["src"]),
-    xpi: path.resolve(grunt_config["xpi"] || XPI_PATH)
-  };
-}
